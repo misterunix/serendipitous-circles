@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"math"
 	"math/rand"
 	"time"
 
@@ -17,12 +16,15 @@ func main() {
 
 	fmt.Println("Starting...")
 
-	stwo := math.Sqrt(2)
+	//stwo := math.Sqrt(2)
 	var width, height float64
 	width = 512
 	height = 512
 
-	maxl := stwo * float64(width)
+	size := int(width * height)
+	bufcount := make([]int, size)
+
+	//maxl := stwo * float64(width)
 
 	rseed := time.Now().UnixNano()
 	randomSource = rand.NewSource(rseed)
@@ -44,7 +46,7 @@ func main() {
 	nmin := -(float64(width) / 2)
 	omax := 65535.0
 	omin := 0.0
-	for i := 0; i < 100000; i++ {
+	for i := 0; i < 1000000; i++ {
 
 		plotx := ((float64(x)-omin)/(omax-omin))*(nmax-nmin) + nmin
 		ploty := ((float64(y)-omin)/(omax-omin))*(nmax-nmin) + nmin
@@ -52,12 +54,15 @@ func main() {
 		ppx := plotx + float64(width)/2
 		ppy := ploty + float64(height)/2
 
-		d := math.Sqrt(ppx*ppx + ppy*ppy)
-		hue := (d / maxl) * 360.0
-		r, g, b := hsl.HSLtoRGB(hue, .8, .8)
-		c2 := ibuffer0.ColorAllocate(int(r), int(g), int(b))
-		ibuffer0.SetPixel(int(ppx), int(ppy), c2)
-
+		//d := math.Sqrt(ppx*ppx + ppy*ppy)
+		//hue := (d / maxl) * 360.0
+		//r, g, b := hsl.HSLtoRGB(hue, .8, .8)
+		//c2 := ibuffer0.ColorAllocate(int(r), int(g), int(b))
+		//ibuffer0.SetPixel(int(ppx), int(ppy), c2)
+		if ppx < width && ppy < height && ppx >= 0 && ppy >= 0 {
+			ind := int(ppy)*int(width) + int(ppx)
+			bufcount[ind]++
+		}
 		xnew = x - y/2
 		ynew = y + uint16(float64(xnew)/2.01)
 
@@ -78,6 +83,28 @@ func main() {
 
 		x = xnew
 		y = ynew
+	}
+
+	imax := 0
+	imin := 10000000
+	for i := 0; i < size; i++ {
+		if bufcount[i] > imax {
+			imax = bufcount[i]
+		}
+		if bufcount[i] < imin {
+			imin = bufcount[i]
+		}
+	}
+
+	for i := 0; i < size; i++ {
+		hue := (float64(bufcount[i]) / float64(imax)) * 360.0
+		ply := float64(i % int(width))
+		plx := float64(i / int(width))
+		//d := math.Sqrt(plx*plx + ply*ply)
+		//sat := d / maxl
+		r, g, b := hsl.HSLtoRGB(hue, .8, .8)
+		c2 := ibuffer0.ColorAllocate(int(r), int(g), int(b))
+		ibuffer0.SetPixel(int(plx), int(ply), c2)
 	}
 
 	pngfilename := fmt.Sprintf("images/%05d.png", 0)
