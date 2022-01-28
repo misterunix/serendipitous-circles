@@ -42,8 +42,8 @@ func main() {
 		plotx := ((float64(x)-omin)/(omax-omin))*(nmax-nmin) + nmin
 		ploty := ((float64(y)-omin)/(omax-omin))*(nmax-nmin) + nmin
 
-		ppx := plotx + float64(width)/2
-		ppy := ploty + float64(height)/2
+		ppx := plotx //+ float64(width)/2
+		ppy := ploty //+ float64(height)/2
 
 		//d := math.Sqrt(ppx*ppx+ppy*ppy)
 
