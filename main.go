@@ -92,6 +92,7 @@ func main() {
 	//ibuffer0.Copy(ibuffer1, width, height, 0, 0, width, height)                 // lr
 	//ibuffer0.CopyRotated(ibuffer1, width/2, height/2, 0, 0, width, height, 180) // ul
 
+	ibr := ibuffer0.Rotate()
 	ibuffer0.CopyRotated(ibuffer1, width/2, 0, 0, 0, width, height, 90) // ur
 	//ibuffer0.CopyRotated(ibuffer1, width/2, height+(height/2), 0, 0, width, height, 270) // ll
 
