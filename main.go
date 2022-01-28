@@ -2,10 +2,12 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"math/rand"
 	"time"
 
 	gd "github.com/misterunix/cgo-gd"
+	"github.com/misterunix/colorworks/hsl"
 )
 
 var randomSource rand.Source
@@ -15,8 +17,12 @@ func main() {
 
 	fmt.Println("Starting...")
 
+	stwo := math.Sqrt(2)
+
 	width := 512
 	height := 512
+
+	maxl := stwo * float64(width)
 
 	rseed := time.Now().UnixNano()
 	randomSource = rand.NewSource(rseed)
@@ -27,12 +33,12 @@ func main() {
 	ibuffer0 := gd.CreateTrueColor(width, height)
 	bgColor := ibuffer0.ColorAllocate(0x0, 0x0, 0x0)
 	ibuffer0.Fill(width/2, height/2, bgColor)
-	c1 := ibuffer0.ColorAllocateAlpha(0xee, 0xee, 0xee, 1)
+	//c1 := ibuffer0.ColorAllocateAlpha(0xee, 0xee, 0xee, 1)
 
 	var x, y, xnew, ynew uint16
 
-	x = uint16(3277)
-	y = uint16(2767)
+	x = uint16(rnd.Intn(65535))
+	y = uint16(rnd.Intn(65535))
 	nmax := float64(width) / 2
 	nmin := -(float64(width) / 2)
 	omax := 65535.0
@@ -42,12 +48,14 @@ func main() {
 		plotx := ((float64(x)-omin)/(omax-omin))*(nmax-nmin) + nmin
 		ploty := ((float64(y)-omin)/(omax-omin))*(nmax-nmin) + nmin
 
-		ppx := plotx //+ float64(width)/2
-		ppy := ploty //+ float64(height)/2
+		ppx := plotx + float64(width)/2
+		ppy := ploty + float64(height)/2
 
-		//d := math.Sqrt(ppx*ppx+ppy*ppy)
-
-		ibuffer0.SetPixel(int(ppx), int(ppy), c1)
+		d := math.Sqrt(ppx*ppx + ppy*ppy)
+		hue := (d / maxl) * 360.0
+		r, g, b := hsl.HSLtoRGB(hue, .8, .8)
+		c2 := ibuffer0.ColorAllocate(int(r), int(g), int(b))
+		ibuffer0.SetPixel(int(ppx), int(ppy), c2)
 
 		xnew = x - y/2
 		ynew = y + xnew/2
