@@ -15,41 +15,58 @@ func main() {
 
 	fmt.Println("Starting...")
 
-	width := 256
-	height := 256
+	width := 512
+	height := 512
 
 	rseed := time.Now().UnixNano()
 	randomSource = rand.NewSource(rseed)
 	rnd = rand.New(randomSource)
 
+	//for k := 0; k < 35; k++ {
+
 	ibuffer0 := gd.CreateTrueColor(width, height)
 	bgColor := ibuffer0.ColorAllocate(0x0, 0x0, 0x0)
 	ibuffer0.Fill(width/2, height/2, bgColor)
-	c1 := ibuffer0.ColorAllocate(0xee, 0xee, 0xee)
+	c1 := ibuffer0.ColorAllocateAlpha(0xee, 0xee, 0xee, 1)
 
-	var x, y, xnew, ynew int16
+	var x, y, xnew, ynew uint16
 
-	x = int16(width) / 2
-	y = int16(height) / 2
+	//x = uint16(rnd.Intn(65535))
+	//y = uint16(rnd.Intn(65545))
+	x = uint16(3277)
+	y = uint16(2767)
 
-	for i := 0; i < 10000000; i++ {
+	for i := 0; i < 100000; i++ {
 
-		ibuffer0.SetPixel(int(x&0x7FFF), int(y&0x7FFF), c1)
+		//new_value = ( (old_value - old_min) / (old_max - old_min) ) * (new_max - new_min) + new_min
+		nmax := float64(width) / 2
+		nmin := -(float64(width) / 2)
+		omax := 65535.0
+		omin := 0.0
+		plotx := ((float64(x)-omin)/(omax-omin))*(nmax-nmin) + nmin
+		ploty := ((float64(y)-omin)/(omax-omin))*(nmax-nmin) + nmin
+		//plotx := ((float64(x)-0.0)/(65535.0-0.0))*((float64(width-1))-0.0) + 0.0
+		//ploty := ((float64(y)-0.0)/(65535.0-0.0))*((float64(height-1))-0.0) + 0.0
+		//ploty := ((y-0)/(65535-0))*((uint16(height-1))-0) + 0
+		//fmt.Println(x, y, plotx, ploty)
+		ppx := plotx + float64(width)/2
+		ppy := ploty + float64(height)/2
+		ibuffer0.SetPixel(int(ppx), int(ppy), c1)
 
 		xnew = x - y/2
 		ynew = y + xnew/2
 
-		if xnew > int16(width) {
-			xnew -= int16(width)
+		if xnew > uint16(65535) {
+			xnew -= uint16(65535)
 		}
 		if xnew < 0 {
-			xnew += int16(width)
+			xnew += uint16(65535)
 		}
-		if ynew > int16(height) {
-			ynew -= int16(height)
+		if ynew > uint16(65535) {
+			ynew -= uint16(65535)
 		}
 		if ynew < 0 {
-			ynew += int16(height)
+			ynew += uint16(65535)
 		}
 
 		//ibuffer0.Line(x, y, xnew, ynew, c1)
@@ -58,7 +75,19 @@ func main() {
 		y = ynew
 	}
 
-	pngfilename := fmt.Sprintf("test.png")
-	ibuffer0.Png(pngfilename)
+	pngfilename := fmt.Sprintf("images/%05d.png", 0)
+	//ibuffer0.Png(pngfilename)
+
+	ibuffer1 := gd.CreateTrueColor(width*2, height*2)
+
+	ibuffer0.Copy(ibuffer1, width, height, 0, 0, width, height) // lr
+
+	ibuffer0.CopyRotated(ibuffer1, width+(width/2), height/2, 0, 0, width, height, 90) // ur
+
+	ibuffer0.CopyRotated(ibuffer1, width/2, height+(height/2), 0, 0, width, height, 270) // ll
+
+	ibuffer0.CopyRotated(ibuffer1, width/2, height/2, 0, 0, width, height, 180)
+
+	ibuffer1.Png(pngfilename)
 
 }
