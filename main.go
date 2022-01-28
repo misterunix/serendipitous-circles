@@ -17,12 +17,13 @@ func main() {
 
 	fmt.Println("Starting...")
 
-	stwo := math.Sqrt(2)
+	//stwo := math.Sqrt(2)
 
-	width := 512
+	width := 1024
 	height := 512
 
-	maxl := stwo * float64(width)
+	maxl := math.Sqrt((float64(width) * float64(width)) + (float64(height) * float64(height)))
+	//stwo * float64(width)
 
 	rseed := time.Now().UnixNano()
 	randomSource = rand.NewSource(rseed)
@@ -40,14 +41,17 @@ func main() {
 	x = uint16(rnd.Intn(65535))
 	y = uint16(rnd.Intn(65535))
 
-	nmax := float64(width) / 2
-	nmin := -(float64(width) / 2)
+	xnmax := float64(width) / 2
+	xnmin := -(float64(width) / 2)
+	ynmax := float64(height) / 2
+	ynmin := -(float64(height) / 2)
+
 	omax := 65535.0
 	omin := 0.0
 	for i := 0; i < 100000; i++ {
 
-		plotx := ((float64(x)-omin)/(omax-omin))*(nmax-nmin) + nmin
-		ploty := ((float64(y)-omin)/(omax-omin))*(nmax-nmin) + nmin
+		plotx := ((float64(x)-omin)/(omax-omin))*(xnmax-xnmin) + xnmin
+		ploty := ((float64(y)-omin)/(omax-omin))*(ynmax-ynmin) + ynmin
 
 		ppx := plotx + float64(width)/2
 		ppy := ploty + float64(height)/2
@@ -85,10 +89,11 @@ func main() {
 
 	ibuffer1 := gd.CreateTrueColor(width*2, height*2)
 
-	ibuffer0.Copy(ibuffer1, width, height, 0, 0, width, height)                          // lr
-	ibuffer0.CopyRotated(ibuffer1, width+(width/2), height/2, 0, 0, width, height, 90)   // ur
-	ibuffer0.CopyRotated(ibuffer1, width/2, height+(height/2), 0, 0, width, height, 270) // ll
-	ibuffer0.CopyRotated(ibuffer1, width/2, height/2, 0, 0, width, height, 180)          // ul
+	//ibuffer0.Copy(ibuffer1, width, height, 0, 0, width, height)                 // lr
+	//ibuffer0.CopyRotated(ibuffer1, width/2, height/2, 0, 0, width, height, 180) // ul
+
+	ibuffer0.CopyRotated(ibuffer1, width/2, 0, 0, 0, width, height, 90) // ur
+	//ibuffer0.CopyRotated(ibuffer1, width/2, height+(height/2), 0, 0, width, height, 270) // ll
 
 	ibuffer1.Png(pngfilename)
 
