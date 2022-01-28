@@ -31,26 +31,22 @@ func main() {
 
 	var x, y, xnew, ynew uint16
 
-	//x = uint16(rnd.Intn(65535))
-	//y = uint16(rnd.Intn(65545))
 	x = uint16(3277)
 	y = uint16(2767)
-
+	nmax := float64(width) / 2
+	nmin := -(float64(width) / 2)
+	omax := 65535.0
+	omin := 0.0
 	for i := 0; i < 100000; i++ {
 
-		//new_value = ( (old_value - old_min) / (old_max - old_min) ) * (new_max - new_min) + new_min
-		nmax := float64(width) / 2
-		nmin := -(float64(width) / 2)
-		omax := 65535.0
-		omin := 0.0
 		plotx := ((float64(x)-omin)/(omax-omin))*(nmax-nmin) + nmin
 		ploty := ((float64(y)-omin)/(omax-omin))*(nmax-nmin) + nmin
-		//plotx := ((float64(x)-0.0)/(65535.0-0.0))*((float64(width-1))-0.0) + 0.0
-		//ploty := ((float64(y)-0.0)/(65535.0-0.0))*((float64(height-1))-0.0) + 0.0
-		//ploty := ((y-0)/(65535-0))*((uint16(height-1))-0) + 0
-		//fmt.Println(x, y, plotx, ploty)
+
 		ppx := plotx + float64(width)/2
 		ppy := ploty + float64(height)/2
+
+		//d := math.Sqrt(ppx*ppx+ppy*ppy)
+
 		ibuffer0.SetPixel(int(ppx), int(ppy), c1)
 
 		xnew = x - y/2
@@ -80,13 +76,10 @@ func main() {
 
 	ibuffer1 := gd.CreateTrueColor(width*2, height*2)
 
-	ibuffer0.Copy(ibuffer1, width, height, 0, 0, width, height) // lr
-
-	ibuffer0.CopyRotated(ibuffer1, width+(width/2), height/2, 0, 0, width, height, 90) // ur
-
+	ibuffer0.Copy(ibuffer1, width, height, 0, 0, width, height)                          // lr
+	ibuffer0.CopyRotated(ibuffer1, width+(width/2), height/2, 0, 0, width, height, 90)   // ur
 	ibuffer0.CopyRotated(ibuffer1, width/2, height+(height/2), 0, 0, width, height, 270) // ll
-
-	ibuffer0.CopyRotated(ibuffer1, width/2, height/2, 0, 0, width, height, 180)
+	ibuffer0.CopyRotated(ibuffer1, width/2, height/2, 0, 0, width, height, 180)          // ul
 
 	ibuffer1.Png(pngfilename)
 
