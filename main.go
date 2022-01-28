@@ -59,7 +59,7 @@ func main() {
 		ibuffer0.SetPixel(int(ppx), int(ppy), c2)
 
 		xnew = x - y/2
-		ynew = y + xnew/2
+		ynew = y + uint16(float64(xnew)/2.1)
 
 		if xnew > uint16(65535) {
 			xnew -= uint16(65535)
