@@ -39,6 +39,7 @@ func main() {
 
 	x = uint16(rnd.Intn(65535))
 	y = uint16(rnd.Intn(65535))
+
 	nmax := float64(width) / 2
 	nmin := -(float64(width) / 2)
 	omax := 65535.0
